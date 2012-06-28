@@ -49,7 +49,7 @@ from IPython.utils.importstring import import_item
 from IPython.utils.jsonutil import extract_dates, squash_dates, date_default
 from IPython.utils.py3compat import str_to_bytes
 from IPython.utils.traitlets import (CBytes, Unicode, Bool, Any, Instance, Set,
-                                        DottedObjectName, CUnicode)
+                                        DottedObjectName, CUnicode, Dict)
 
 #-----------------------------------------------------------------------------
 # utility functions
@@ -292,6 +292,9 @@ class Session(Configurable):
     username = Unicode(os.environ.get('USER',u'username'), config=True,
         help="""Username for the Session. Default is your system username.""")
 
+    metadata = Dict({}, config=True,
+        help="""Metadata dictionary, which serves as the default top-level metadata dict for each message.""")
+
     # message signature related traits:
     
     key = CBytes(b'', config=True,
@@ -402,7 +405,7 @@ class Session(Configurable):
     def msg_header(self, msg_type):
         return msg_header(self.msg_id, msg_type, self.username, self.session)
 
-    def msg(self, msg_type, content=None, parent=None, subheader=None, header=None):
+    def msg(self, msg_type, content=None, parent=None, subheader=None, header=None, metadata=None):
         """Return the nested message dict.
 
         This format is different from what is sent over the wire. The
@@ -412,12 +415,17 @@ class Session(Configurable):
         msg = {}
         header = self.msg_header(msg_type) if header is None else header
         msg['header'] = header
+        if subheader is not None:
+            msg['header'].update(subheader)
         msg['msg_id'] = header['msg_id']
         msg['msg_type'] = header['msg_type']
         msg['parent_header'] = {} if parent is None else extract_header(parent)
         msg['content'] = {} if content is None else content
-        sub = {} if subheader is None else subheader
-        msg['header'].update(sub)
+        metadata_dict = self.metadata.copy()
+        if metadata is not None:
+            metadata_dict.update(metadata)
+        if metadata_dict:
+            msg['metadata'] = metadata_dict
         return msg
 
     def sign(self, msg_list):
@@ -492,7 +500,7 @@ class Session(Configurable):
         return to_send
 
     def send(self, stream, msg_or_type, content=None, parent=None, ident=None,
-             buffers=None, subheader=None, track=False, header=None):
+             buffers=None, subheader=None, track=False, header=None, metadata=None):
         """Build and send a message via stream or socket.
 
         The message format used by this function internally is as follows:
@@ -516,7 +524,7 @@ class Session(Configurable):
         content : dict or None
             The content of the message (ignored if msg_or_type is a message).
         header : dict or None
-            The header dict for the message (ignores if msg_to_type is a message).
+            The header dict for the message (ignored if msg_to_type is a message).
         parent : Message or dict or None
             The parent or parent header describing the parent of this message
             (ignored if msg_or_type is a message).
@@ -525,11 +533,14 @@ class Session(Configurable):
         subheader : dict or None
             Extra header keys for this message's header (ignored if msg_or_type
             is a message).
+        metadata : dict or None
+            The metadata describing the message
         buffers : list or None
             The already-serialized buffers to be appended to the message.
         track : bool
             Whether to track.  Only for use with Sockets, because ZMQStream
             objects cannot track messages.
+            
 
         Returns
         -------
@@ -553,7 +564,7 @@ class Session(Configurable):
             msg = msg_or_type
         else:
             msg = self.msg(msg_or_type, content=content, parent=parent,
-                           subheader=subheader, header=header)
+                           subheader=subheader, header=header, metadata=metadata)
 
         buffers = [] if buffers is None else buffers
         to_send = self.serialize(msg, ident)
