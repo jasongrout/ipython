@@ -26,8 +26,24 @@ define(["notebook/js/widgets/base"], function(widget_manager){
                 .attr('id', guid)
                 .addClass('accordion');
             this.containers = [];
+            this.update_children([], this.model.get('children'));
+            this.model.on('change:children', function(model, value, options) {
+                    this.update_children(model.previous('children'), value);
+                }, this);
         },
         
+        update_children: function(old_list, new_list) {
+            _.each(this.containers, function(element, index, list) {
+                element.remove();
+            }, this);
+            this.containers = [];
+            this.update_child_views(old_list, new_list);
+            _.each(new_list, function(element, index, list) {
+                this.add_child_view(this.child_views[element]);
+            }, this)
+        },
+        
+
         update: function() {
             // Set tab titles
             var titles = this.model.get('_titles');
@@ -58,7 +74,7 @@ define(["notebook/js/widgets/base"], function(widget_manager){
             return IPython.WidgetView.prototype.update.call(this);
         },
 
-        display_child: function(view) {
+        add_child_view: function(view) {
 
             var index = this.containers.length;
             var uuid = IPython.utils.uuid();
@@ -103,6 +119,11 @@ define(["notebook/js/widgets/base"], function(widget_manager){
     
     var TabView = IPython.WidgetView.extend({
         
+	initialize: function() {
+	    this.containers = [];
+	    IPython.WidgetView.prototype.initialize.apply(this, arguments);
+	},
+
         render: function(){
             var uuid = 'tabs'+IPython.utils.uuid();
             var that = this;
@@ -113,8 +134,11 @@ define(["notebook/js/widgets/base"], function(widget_manager){
             this.$tab_contents = $('<div />', {id: uuid + 'Content'})
                 .addClass('tab-content')
                 .appendTo(this.$el);
-
-            this.containers = [];
+	    var children = this.model.get('children');
+	    for (var i in children) {
+		this.add_child_view(this.child_view(children[i]))
+	    }
+	    this.update();
         },
 
         update: function() {
@@ -135,8 +159,7 @@ define(["notebook/js/widgets/base"], function(widget_manager){
             return IPython.WidgetView.prototype.update.call(this);
         },
 
-        display_child: function(view) {
-
+        add_child_view: function(view) {
             var index = this.containers.length;
             var uuid = IPython.utils.uuid();
 
@@ -161,11 +184,6 @@ define(["notebook/js/widgets/base"], function(widget_manager){
                 .addClass('fade')
                 .append(view.$el)
                 .appendTo(this.$tab_contents);
-
-            if (index === 0) {
-                tab_text.tab('show');
-            }
-            this.update();
         },
 
         select_page: function(index) {

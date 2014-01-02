@@ -14,7 +14,7 @@ Represents a container that can be used to group other widgets.
 # Imports
 #-----------------------------------------------------------------------------
 from .widget import Widget
-from IPython.utils.traitlets import Unicode, Bool
+from IPython.utils.traitlets import Unicode, Bool, List, Instance
 
 #-----------------------------------------------------------------------------
 # Classes
@@ -27,7 +27,10 @@ class ContainerWidget(Widget):
     # classes...
     _keys = ['_vbox', '_hbox', '_align_start', '_align_end', '_align_center',
             '_pack_start', '_pack_end', '_pack_center', '_flex0', '_flex1', 
-            '_flex2', 'description', 'button_text']
+            '_flex2', 'description', 'button_text',
+            'children']
+    children = List(Instance(Widget))
+    
     description = Unicode()
     button_text = Unicode()
     _hbox = Bool(False)

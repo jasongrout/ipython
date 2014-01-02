@@ -52,15 +52,25 @@ define(["notebook/js/widgets/base"], function(widget_manager) {
         render: function(){
             this.$el
                 .addClass('widget-container');
+            this.children={};
+            this.update_children([], this.model.get('children'));
+            this.model.on('change:children', function(model, value, options) {
+                this.update_children(model.previous('children'), value);
+            }, this);
+            this.update()
+        },
+        
+        update_children: function(old_list, new_list) {
+            this.$el.empty();
+            this.update_child_views(old_list, new_list);
+            _.each(new_list, function(element, index, list) {
+                this.$el.append(this.child_views[element].$el);
+            }, this)
         },
         
         update: function(){
             set_flex_properties(this, this.$el);
             return IPython.WidgetView.prototype.update.call(this);
-        },
-
-        display_child: function(view) {
-            this.$el.append(view.$el);
         },
     });
 
@@ -227,10 +237,6 @@ define(["notebook/js/widgets/base"], function(widget_manager) {
             }
             
             return IPython.WidgetView.prototype.update.call(this);
-        },
-
-        display_child: function(view) {
-            this.$body.append(view.$el);
         },
         
         _get_selector_element: function(selector) {

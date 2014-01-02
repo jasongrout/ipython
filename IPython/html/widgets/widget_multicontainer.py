@@ -15,7 +15,7 @@ pages.
 # Imports
 #-----------------------------------------------------------------------------
 from .widget import Widget
-from IPython.utils.traitlets import Unicode, Dict, Int
+from IPython.utils.traitlets import Unicode, Dict, Int, List, Instance
 
 #-----------------------------------------------------------------------------
 # Classes
@@ -25,13 +25,15 @@ class MulticontainerWidget(Widget):
     default_view_name = Unicode('TabView')
 
     # Keys
-    _keys = ['_titles', 'selected_index']
+    _keys = ['_titles', 'selected_index', 'children']
     _titles = Dict(help="Titles of the pages")
     selected_index = Int(0)
 
+    children = List(Instance(Widget))
+
     # Public methods
     def set_title(self, index, title):
-        """Sets the title of a container pages
+        """Sets the title of a container page
 
         Parameters
         ----------
