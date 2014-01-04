@@ -10,14 +10,15 @@ casper.notebook_test(function () {
     var multicontainer1_query = '.widget-area .widget-subarea div div.nav-tabs';
     var multicontainer1_index = this.append_cell(
         'multicontainer = widgets.MulticontainerWidget()\n' +
-        'page1 = widgets.StringWidget(parent=multicontainer)\n' +
-        'page2 = widgets.StringWidget(parent=multicontainer)\n' +
-        'page3 = widgets.StringWidget(parent=multicontainer)\n' +
+        'page1 = widgets.StringWidget()\n' +
+        'page2 = widgets.StringWidget()\n' +
+        'page3 = widgets.StringWidget()\n' +
+        'multicontainer.children = [page1, page2, page3]\n' +
         'display(multicontainer)\n' +
         'multicontainer.selected_index = 0\n' +
         'print("Success")\n');
     this.execute_cell_then(multicontainer1_index, function(index){
-
+        
         this.test.assert(this.get_output_cell(index).text == 'Success\n', 
             'Create multicontainer cell executed with correct output. (1)');
 
@@ -64,9 +65,10 @@ casper.notebook_test(function () {
     var multicontainer2_query = '.widget-area .widget-subarea .accordion';
     var multicontainer2_index = this.append_cell(
         'multicontainer = widgets.MulticontainerWidget()\n' +
-        'page1 = widgets.StringWidget(parent=multicontainer)\n' +
-        'page2 = widgets.StringWidget(parent=multicontainer)\n' +
-        'page3 = widgets.StringWidget(parent=multicontainer)\n' +
+        'page1 = widgets.StringWidget()\n' +
+        'page2 = widgets.StringWidget()\n' +
+        'page3 = widgets.StringWidget()\n' +
+        'multicontainer.children = [page1, page2, page3]\n' +
         'multicontainer.set_title(2, "good")\n' +
         'display(multicontainer, view_name="AccordionView")\n' +
         'multicontainer.selected_index = 0\n' +

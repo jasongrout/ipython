@@ -35,7 +35,7 @@ class BaseWidget(LoggingConfigurable):
 
     # Shared declarations (Class level)
     _keys = List(Unicode, default_value = [], 
-                 help="List of keys comprising the state of the model.", allow_none=False)
+        help="List of keys comprising the state of the model.", allow_none=False)
     widget_construction_callback = None
 
     def on_widget_constructed(callback):
@@ -105,6 +105,10 @@ class BaseWidget(LoggingConfigurable):
         if self._comm is None:
             self._open_communication()
         return self._comm
+    
+    @property
+    def model_id(self):
+        return self.comm.comm_id
 
     # Event handlers
     def _handle_msg(self, msg):
@@ -200,7 +204,7 @@ class BaseWidget(LoggingConfigurable):
             A single property's name to sync with the frontend.
         """
         self._send({"method": "update",
-                    "state": self.get_state()})
+            "state": self.get_state()})
 
     def get_state(self, key=None):
         """Gets the widget state, or a piece of it.
@@ -226,10 +230,10 @@ class BaseWidget(LoggingConfigurable):
             # encoder to look for a _repr_json property before giving
             # up encoding
             if isinstance(value, BaseWidget):
-                value = value.comm.comm_id
+                value = value.model_id
             elif isinstance(value, list) and len(value)>0 and isinstance(value[0], BaseWidget):
                 # assume all elements of the list are widgets
-                value = [i.comm.comm_id for i in value]
+                value = [i.model_id for i in value]
             state[k] = value
         return state
 
@@ -243,7 +247,7 @@ class BaseWidget(LoggingConfigurable):
             Content of the message to send.
         """
         self._send({"method": "custom",
-                        "custom_content": content})
+            "custom_content": content})
 
 
     def on_msg(self, callback, remove=False):
@@ -333,7 +337,16 @@ class BaseWidget(LoggingConfigurable):
             self._comm.send(msg)
             return True
         else:
-            return False        
+            return False     
+
+
+class ViewWidget(BaseWidget):
+    target_name = Unicode('ViewModel')
+
+    def __init__(self, widget, view):
+        self.default_view_name = view
+        self.widget = widget
+
 
 class Widget(BaseWidget):
     visible = Bool(True, help="Whether or not the widget is visible.")
@@ -420,8 +433,8 @@ class Widget(BaseWidget):
             be added to.
         """
         self.send({"msg_type": "add_class",
-                   "class_list": class_name,
-                   "selector": selector})
+            "class_list": class_name,
+            "selector": selector})
 
 
     def remove_class(self, class_name, selector=""):
@@ -437,5 +450,11 @@ class Widget(BaseWidget):
             be removed from.
         """
         self.send({"msg_type": "remove_class",
-                   "class_list": class_name,
-                   "selector": selector})
+            "class_list": class_name,
+            "selector": selector})
+
+
+    def view(self, view_name=None):
+        """Return a widget that can be displayed to display this widget using
+        a non-default view"""
+        return ViewWidget(self, view_name)
