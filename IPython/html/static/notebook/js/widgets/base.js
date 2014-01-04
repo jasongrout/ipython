@@ -173,7 +173,9 @@ function(widget_manager, underscore, backbone){
             this.widget_manager = options.widget_manager;
             this.comm_manager = options.widget_manager.comm_manager;
             this.cell = options.cell;
+            this.options = options.options;
             this.child_views = [];
+            this.model.views.push(this);
         },
 
         update: function(){
@@ -181,11 +183,11 @@ function(widget_manager, underscore, backbone){
             // triggered on model change
         },
 
-        child_view: function(comm_id, view_name) {
+        child_view: function(comm_id, view_name, options) {
             // create and return a child view, given a comm id for a model and (optionally) a view name
             // if the view name is not given, it defaults to the model's default view attribute
             var child_model = this.comm_manager.comms[comm_id].model;
-            var child_view = this.widget_manager.create_view(child_model, view_name, this.cell);
+            var child_view = this.widget_manager.create_view(child_model, view_name, this.cell, options);
             this.child_views[comm_id] = child_view;
             return child_view;
         },
