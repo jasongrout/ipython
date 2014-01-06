@@ -172,7 +172,6 @@ function(widget_manager, underscore, backbone){
             this.model.on('change',this.update,this);
             this.widget_manager = options.widget_manager;
             this.comm_manager = options.widget_manager.comm_manager;
-            this.cell = options.cell;
             this.options = options.options;
             this.child_views = [];
             this.model.views.push(this);
@@ -187,7 +186,7 @@ function(widget_manager, underscore, backbone){
             // create and return a child view, given a model id for a model and (optionally) a view name
             // if the view name is not given, it defaults to the model's default view attribute
             var child_model = this.widget_manager.get_model(model_id);
-            var child_view = this.widget_manager.create_view(child_model, view_name, this.cell, options);
+            var child_view = this.widget_manager.create_view(child_model, view_name, options);
             this.child_views[model_id] = child_view;
             return child_view;
         },
@@ -217,47 +216,11 @@ function(widget_manager, underscore, backbone){
             // render the view.  By default, this is only called the first time the view is created
         },
         send: function (content) {
-            this.model.send(content, this._callbacks());
+            this.model.send(content, this.widget_manager.callbacks(this));
         },
 
         touch: function () {
-            this.model.save(this.model.changedAttributes(), {patch: true, callbacks: this._callbacks()});
-        },
-
-        _callbacks: function () {
-            // callback handlers specific to this view's cell
-            var callbacks = {};
-            var cell = this.cell;
-            if (cell !== null) {
-                // Try to get output handlers
-                var handle_output = null;
-                var handle_clear_output = null;
-                if (cell.output_area !== undefined && cell.output_area !== null) {
-                    handle_output = $.proxy(cell.output_area.handle_output, cell.output_area);
-                    handle_clear_output = $.proxy(cell.output_area.handle_clear_output, cell.output_area);
-                }
-
-                // Create callback dict using what is known
-                var that = this;
-                callbacks = {
-                    iopub : {
-                        output : handle_output,
-                        clear_output : handle_clear_output,
-
-                        status : function (msg) {
-                            that.model._handle_status(msg, that._callbacks());
-                        },
-
-                        // Special function only registered by widget messages.
-                        // Allows us to get the cell for a message so we know
-                        // where to add widgets if the code requires it.
-                        get_cell : function () {
-                            return cell;
-                        },
-                    },
-                };
-            }
-            return callbacks;
+            this.model.save(this.model.changedAttributes(), {patch: true, callbacks: this.widget_manager.callbacks(this)});
         },
 
     });
