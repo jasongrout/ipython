@@ -183,7 +183,7 @@ function(widget_manager, underscore, backbone){
             // triggered on model change
         },
 
-        child_view: function(comm_id, view_name, options) {
+        child_view: function(model_id, view_name, options) {
             // create and return a child view, given a comm id for a model and (optionally) a view name
             // if the view name is not given, it defaults to the model's default view attribute
             var child_model = this.widget_manager.get_model(model_id);
