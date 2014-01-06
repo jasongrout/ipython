@@ -90,11 +90,11 @@
             }
         }
 
-        WidgetManager.prototype.create_view = function(model, view_name, cell) {
+        WidgetManager.prototype.create_view = function(model, view_name, cell, options) {
             view_name = view_name || model.get('default_view_name');
             var ViewType = this.widget_view_types[view_name];
             if (ViewType !== undefined && ViewType !== null) {
-                var view = new ViewType({model: model, widget_manager: this, cell: cell});
+                var view = new ViewType({model: model, widget_manager: this, cell: cell, options: options});
                 view.render();
                 model.views.push(view);
                 model.on('destroy', view.remove, view);
@@ -110,8 +110,8 @@
 
                         // Close the comm if there are no views left.
                         if (that.views.length() === 0) {
-                //trigger comm close event?
-                            }
+                            //trigger comm close event?
+                        }
 
                     
                             if (that.comm !== undefined) {
