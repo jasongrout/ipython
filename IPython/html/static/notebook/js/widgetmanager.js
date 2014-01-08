@@ -78,7 +78,7 @@
                         console.log("Could not determine where the display" + 
                             " message was from.  Widget will not be displayed");
                     } else {
-                        var view = this.create_view(model, msg.content.data.view_name);
+                        var view = this.create_view(model);
                         if (view !== undefined 
                             && cell.widget_subarea !== undefined 
                             && cell.widget_subarea !== null) {
@@ -92,38 +92,14 @@
             }
         }
 
-        WidgetManager.prototype.create_view = function(model, view_name, options) {
-            view_name = view_name || model.get('default_view_name');
+        WidgetManager.prototype.create_view = function(model, options) {
+            var view_name = model.get('view_name');
             var ViewType = this._view_types[view_name];
             if (ViewType !== undefined && ViewType !== null) {
                 var view = new ViewType({model: model, widget_manager: this, options: options});
                 view.render();
                 model.views.push(view);
                 model.on('destroy', view.remove, view);
-                /*
-                    // TODO: handle view deletion.  Don't forget to delete child views
-                    var that = this;
-                    view.$el.on("remove", function () { 
-                        var index = that.views.indexOf(view);
-                        if (index > -1) {
-                            that.views.splice(index, 1);
-                        }
-                        view.remove(); // Clean-up view 
-
-                        // Close the comm if there are no views left.
-                        if (that.views.length() === 0) {
-                            //trigger comm close event?
-                        }
-
-                    
-                            if (that.comm !== undefined) {
-                                that.comm.close();
-                                delete that.comm.model; // Delete ref so GC will collect widget model.
-                                delete that.comm;
-                            }
-                            delete that.model_id; // Delete id from model so widget manager cleans up.
-                        });
-                */
                 return view;
             }
         },
