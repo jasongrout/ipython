@@ -178,7 +178,7 @@ function(widget_manager, underscore, backbone){
         },
 
     });
-    widget_manager.register_widget_model('WidgetModel', WidgetModel);
+    IPython.widget_registry.register_widget_model('WidgetModel', WidgetModel);
 
 
 
@@ -201,8 +201,8 @@ function(widget_manager, underscore, backbone){
         child_view: function(model_id, options) {
             // create and return a child view, given a model id for a model and (optionally) a view name
             // if the view name is not given, it defaults to the model's default view attribute
-            var child_model = this.widget_manager.get_model(model_id);
-            var child_view = this.widget_manager.create_view(child_model, options);
+            var child_model = this.model.widget_manager.get_model(model_id);
+            var child_view = this.model.widget_manager.create_view(child_model, options);
             this.child_views[model_id] = child_view;
             return child_view;
         },

@@ -32,44 +32,37 @@
             if (options.success) {
                 options.success(result);
             }
-        }; 
+        };
 
         //--------------------------------------------------------------------
         // WidgetManager class
         //--------------------------------------------------------------------
         var WidgetManager = function () {
             this.comm_manager = null;
-            this._model_types = {}; /* Dictionary of model type names 
-                                      (target_name) and model types. */
-            this._view_types = {}; /* Dictionary of view names and view types. */
             this._models = {}; /* Dictionary of model ids and model instances */
         };
 
 
         WidgetManager.prototype.attach_comm_manager = function (comm_manager) {
             this.comm_manager = comm_manager;
-
+            IPython.widget_registry[this.comm_manager.kernel.kernel_id] = this;
+            var model_types = IPython.widget_registry.model_types;
             // Register already-registered widget model types with the comm manager.
-            for (var widget_model_name in this._model_types) {
-                this.comm_manager.register_target(widget_model_name, $.proxy(this._handle_comm_open, this));
+            for (var m in model_types) {
+                if (!model_types.hasOwnProperty(m)) {continue;}
+                this.register_widget_model(m);
             }
         };
 
-
-        WidgetManager.prototype.register_widget_model = function (widget_model_name, widget_model_type) {
+        //TODO on widget_manager destruction, remove from the registry object
+        
+        WidgetManager.prototype.register_widget_model = function (widget_model_name) {
             // Register the widget with the comm manager.  Make sure to pass this object's context
             // in so `this` works in the call back.
             if (this.comm_manager !== null) {
                 this.comm_manager.register_target(widget_model_name, $.proxy(this._handle_comm_open, this));
             }
-            this._model_types[widget_model_name] = widget_model_type;
         };
-
-
-        WidgetManager.prototype.register_widget_view = function (widget_view_name, widget_view_type) {
-            this._view_types[widget_view_name] = widget_view_type;
-        };
-
 
         WidgetManager.prototype.display_view = function(msg_id, model) {
             var cell = this.get_msg_cell(msg_id);
@@ -92,7 +85,7 @@
 
         WidgetManager.prototype.create_view = function(model, options) {
             var view_name = model.get('view_name');
-            var ViewType = this._view_types[view_name];
+            var ViewType = IPython.widget_registry.view_types[view_name];
             if (ViewType !== undefined && ViewType !== null) {
                 var parameters = {model: model, options: options};
                 var view = new ViewType(parameters);
@@ -190,18 +183,35 @@
 
         WidgetManager.prototype._handle_comm_open = function (comm, msg) {
             var widget_type_name = msg.content.target_name;
-            var widget_model = new this._model_types[widget_type_name](this, comm.comm_id, comm);
-            this._models[comm.comm_id] = widget_model; // comm_id == model_id
+            var model_id = comm.comm_id;
+            var widget_model = new IPython.widget_registry.model_types[widget_type_name](this, model_id, comm);
+            this._models[model_id] = widget_model; // comm_id == model_id
         };
         
+        var WidgetRegistry = function() {
+            this.model_types = {};
+            this.view_types = {};
+            this.widget_managers = {};
+        }
+        
+        WidgetRegistry.prototype.register_widget_model = function (widget_model_name, widget_model_type) {
+            this.model_types[widget_model_name] = widget_model_type;
+            for (var wm in this.widget_managers) {
+                if (!this.widget_managers.hasOwnProperty(wm)) {continue;}
+                this.widget_managers[wm].register_widget_model(widget_model_name);
+            }
+        };
+
+        WidgetRegistry.prototype.register_widget_view = function (widget_view_name, widget_view_type) {
+            this.view_types[widget_view_name] = widget_view_type;
+        };
+
         //--------------------------------------------------------------------
         // Init code
         //--------------------------------------------------------------------
         IPython.WidgetManager = WidgetManager;
-        if (IPython.widget_manager === undefined || IPython.widget_manager === null) {
-            IPython.widget_manager = new WidgetManager();    
-        }
+        IPython.widget_registry = new WidgetRegistry();
 
-        return IPython.widget_manager;
+        return IPython.widget_registry;
     });
 }());
