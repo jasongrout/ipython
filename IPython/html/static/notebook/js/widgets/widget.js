@@ -178,6 +178,8 @@ function(widget_manager, underscore, backbone){
         },
 
     });
+    widget_manager.register_widget_model('WidgetModel', WidgetModel);
+
 
 
     //--------------------------------------------------------------------

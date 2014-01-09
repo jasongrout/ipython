@@ -52,7 +52,7 @@ class Widget(LoggingConfigurable):
     
 
     # Public declarations (Instance level)
-    target_name = Unicode('widget', help="""Name of the backbone model 
+    target_name = Unicode('WidgetModel', help="""Name of the backbone model 
         registered in the frontend to create and sync this widget with.""")
     view_name = Unicode(help="""Default view registered in the frontend
         to use to represent the widget.""")
