@@ -101,8 +101,7 @@ function(widget_manager, underscore, backbone){
                     }
                 }
             }
-            //TODO: are there callbacks that make sense in this case?  If so, attach them here as an option
-            this.save();
+            //TODO: are there callbacks that make sense in this case?  If so, attach them here as an option 
         },
 
 
