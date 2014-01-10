@@ -14,10 +14,7 @@
  * @namespace IPython
  **/
 
-define(["notebook/js/widgets/widget"], function(widget_manager){
-    var StringWidgetModel = IPython.WidgetModel.extend({});
-    widget_manager.register_widget_model('StringWidgetModel', StringWidgetModel);
-
+define(["notebook/js/widgets/widget"], function(widget_registry){
     var HTMLView = IPython.DOMWidgetView.extend({
       
         // Called when view is rendered.
@@ -34,7 +31,7 @@ define(["notebook/js/widgets/widget"], function(widget_manager){
         
     });
 
-    widget_manager.register_widget_view('HTMLView', HTMLView);
+    widget_registry.register_widget_view('HTMLView', HTMLView);
 
 
     var LatexView = IPython.DOMWidgetView.extend({
@@ -55,7 +52,7 @@ define(["notebook/js/widgets/widget"], function(widget_manager){
         
     });
 
-    widget_manager.register_widget_view('LatexView', LatexView);
+    widget_registry.register_widget_view('LatexView', LatexView);
 
     var TextAreaView = IPython.DOMWidgetView.extend({
       
@@ -124,7 +121,7 @@ define(["notebook/js/widgets/widget"], function(widget_manager){
         },
     });
 
-    widget_manager.register_widget_view('TextAreaView', TextAreaView);
+    widget_registry.register_widget_view('TextAreaView', TextAreaView);
 
     var TextBoxView = IPython.DOMWidgetView.extend({
       
@@ -184,5 +181,5 @@ define(["notebook/js/widgets/widget"], function(widget_manager){
         },
     });
 
-    widget_manager.register_widget_view('TextBoxView', TextBoxView);
+    widget_registry.register_widget_view('TextBoxView', TextBoxView);
 });

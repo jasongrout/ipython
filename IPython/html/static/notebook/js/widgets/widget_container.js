@@ -14,7 +14,7 @@
  * @namespace IPython
  **/
 
-define(["notebook/js/widgets/widget"], function(widget_manager) {
+define(["notebook/js/widgets/widget"], function(widget_registry) {
 
     var set_flex_property = function(element, property_name, enabled) {
         if (enabled) {
@@ -44,9 +44,6 @@ define(["notebook/js/widgets/widget"], function(widget_manager) {
 
 
 
-    var ContainerModel = IPython.WidgetModel.extend({});
-    widget_manager.register_widget_model('ContainerWidgetModel', ContainerModel);
-
     var ContainerView = IPython.DOMWidgetView.extend({
         
         render: function(){
@@ -74,7 +71,7 @@ define(["notebook/js/widgets/widget"], function(widget_manager) {
         },
     });
 
-    widget_manager.register_widget_view('ContainerView', ContainerView);
+    widget_registry.register_widget_view('ContainerView', ContainerView);
 
 
     var ModalView = IPython.DOMWidgetView.extend({
@@ -275,5 +272,5 @@ define(["notebook/js/widgets/widget"], function(widget_manager) {
         
     });
 
-    widget_manager.register_widget_view('ModalView', ModalView);
+    widget_registry.register_widget_view('ModalView', ModalView);
 });

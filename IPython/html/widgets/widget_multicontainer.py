@@ -21,7 +21,6 @@ from IPython.utils.traitlets import Unicode, Dict, Int, List, Instance
 # Classes
 #-----------------------------------------------------------------------------
 class MulticontainerWidget(DOMWidget):
-    target_name = Unicode('MulticontainerWidgetModel')
     view_name = Unicode('TabView')
 
     # Keys

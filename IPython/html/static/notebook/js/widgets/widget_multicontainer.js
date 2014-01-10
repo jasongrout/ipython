@@ -14,10 +14,7 @@
  * @namespace IPython
  **/
 
-define(["notebook/js/widgets/widget"], function(widget_manager){
-    var MulticontainerModel = IPython.WidgetModel.extend({});
-    widget_manager.register_widget_model('MulticontainerWidgetModel', MulticontainerModel);
-
+define(["notebook/js/widgets/widget"], function(widget_registry){
     var AccordionView = IPython.DOMWidgetView.extend({
         
         render: function(){
@@ -115,7 +112,7 @@ define(["notebook/js/widgets/widget"], function(widget_manager){
         },
     });
 
-    widget_manager.register_widget_view('AccordionView', AccordionView);
+    widget_registry.register_widget_view('AccordionView', AccordionView);
     
     var TabView = IPython.DOMWidgetView.extend({
         
@@ -204,5 +201,5 @@ define(["notebook/js/widgets/widget"], function(widget_manager){
         },
     });
 
-    widget_manager.register_widget_view('TabView', TabView);
+    widget_registry.register_widget_view('TabView', TabView);
 });

@@ -14,11 +14,8 @@
  * @namespace IPython
  **/
 
-define(["notebook/js/widgets/widget"], function(widget_manager){
+define(["notebook/js/widgets/widget"], function(widget_registry){
     
-    var BoolWidgetModel = IPython.WidgetModel.extend({});
-    widget_manager.register_widget_model('BoolWidgetModel', BoolWidgetModel);
-
     var CheckboxView = IPython.DOMWidgetView.extend({
       
         // Called when view is rendered.
@@ -66,7 +63,7 @@ define(["notebook/js/widgets/widget"], function(widget_manager){
         
     });
 
-    widget_manager.register_widget_view('CheckboxView', CheckboxView);
+    widget_registry.register_widget_view('CheckboxView', CheckboxView);
 
     var ToggleButtonView = IPython.DOMWidgetView.extend({
       
@@ -118,6 +115,6 @@ define(["notebook/js/widgets/widget"], function(widget_manager){
         },
     });
 
-    widget_manager.register_widget_view('ToggleButtonView', ToggleButtonView);
+    widget_registry.register_widget_view('ToggleButtonView', ToggleButtonView);
 
 });

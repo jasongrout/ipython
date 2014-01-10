@@ -14,10 +14,7 @@
  * @namespace IPython
  **/
 
-define(["notebook/js/widgets/widget"], function(widget_manager){
-    var ImageWidgetModel = IPython.WidgetModel.extend({});
-    widget_manager.register_widget_model('ImageWidgetModel', ImageWidgetModel);
-
+define(["notebook/js/widgets/widget"], function(widget_registry){
     var ImageView = IPython.DOMWidgetView.extend({
       
         // Called when view is rendered.
@@ -50,6 +47,6 @@ define(["notebook/js/widgets/widget"], function(widget_manager){
         
     });
 
-    widget_manager.register_widget_view('ImageView', ImageView);
+    widget_registry.register_widget_view('ImageView', ImageView);
 
 });

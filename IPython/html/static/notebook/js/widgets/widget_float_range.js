@@ -14,10 +14,7 @@
  * @namespace IPython
  **/
 
-define(["notebook/js/widgets/widget"], function(widget_manager){
-    var FloatRangeWidgetModel = IPython.WidgetModel.extend({});
-    widget_manager.register_widget_model('FloatRangeWidgetModel', FloatRangeWidgetModel);
-
+define(["notebook/js/widgets/widget"], function(widget_registry){
     var FloatSliderView = IPython.DOMWidgetView.extend({
         
         // Called when view is rendered.
@@ -113,7 +110,7 @@ define(["notebook/js/widgets/widget"], function(widget_manager){
         },
     });
 
-    widget_manager.register_widget_view('FloatSliderView', FloatSliderView);
+    widget_registry.register_widget_view('FloatSliderView', FloatSliderView);
 
 
     var FloatTextView = IPython.DOMWidgetView.extend({
@@ -204,7 +201,7 @@ define(["notebook/js/widgets/widget"], function(widget_manager){
         }
     });
 
-    widget_manager.register_widget_view('FloatTextView', FloatTextView);
+    widget_registry.register_widget_view('FloatTextView', FloatTextView);
 
 
     var ProgressView = IPython.DOMWidgetView.extend({
@@ -251,5 +248,5 @@ define(["notebook/js/widgets/widget"], function(widget_manager){
         
     });
 
-    widget_manager.register_widget_view('ProgressView', ProgressView);
+    widget_registry.register_widget_view('ProgressView', ProgressView);
 });

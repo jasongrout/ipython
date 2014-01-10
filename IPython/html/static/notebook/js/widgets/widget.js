@@ -17,7 +17,7 @@
 define(["notebook/js/widgetmanager",
         "underscore",
         "backbone"], 
-function(widget_manager, underscore, backbone){
+function(widget_registry, underscore, backbone){
     
     //--------------------------------------------------------------------
     // WidgetModel class
@@ -177,7 +177,7 @@ function(widget_manager, underscore, backbone){
         },
 
     });
-    IPython.widget_registry.register_widget_model('WidgetModel', WidgetModel);
+    widget_registry.register_widget_model('WidgetModel', WidgetModel);
 
 
 
@@ -327,5 +327,5 @@ function(widget_manager, underscore, backbone){
     IPython.WidgetView = WidgetView;
     IPython.DOMWidgetView = DOMWidgetView;
 
-    return widget_manager;
+    return widget_registry;
 });
