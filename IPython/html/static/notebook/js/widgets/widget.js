@@ -246,6 +246,9 @@ function(widget_registry, underscore, backbone){
 
     });
 
+    widget_registry.register_widget_view('WidgetView', WidgetView);
+
+
     var DOMWidgetView = WidgetView.extend({
         initialize: function (options) {
             // TODO: make changes more granular (e.g., trigger on visible:change)
