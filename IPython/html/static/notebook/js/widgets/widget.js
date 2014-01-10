@@ -175,7 +175,9 @@ function(widget_registry, underscore, backbone){
             // arrived.
             return model_json;
         },
-
+        push: function(callbacks) {
+            this.save(this.changedAttributes(), {patch: true, callbacks: callbacks});
+        }
     });
     widget_registry.register_widget_model('WidgetModel', WidgetModel);
 
@@ -241,7 +243,7 @@ function(widget_registry, underscore, backbone){
         },
 
         touch: function () {
-            this.model.save(this.model.changedAttributes(), {patch: true, callbacks: this.callbacks()});
+            this.model.push(this.callbacks());
         },
 
     });
