@@ -230,7 +230,7 @@ function(widget_manager, underscore, backbone){
         },
 
         callbacks: function(){
-            return this.widget_manager.callbacks(this);
+            return this.model.widget_manager.callbacks(this);
         },
 
         render: function(){
