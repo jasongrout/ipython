@@ -70,12 +70,11 @@
                 console.log("Could not determine where the display" + 
                     " message was from.  Widget will not be displayed");
             } else {
-                var view = this.create_view(model);
+                var view = this.create_view(model, {cell: cell});
                 if (view !== undefined 
                     && cell.widget_subarea !== undefined 
                     && cell.widget_subarea !== null) {
                     
-                    view.cell = cell;
                     cell.widget_area.show();
                     cell.widget_subarea.append(view.$el);
                 }
@@ -129,7 +128,7 @@
         WidgetManager.prototype.callbacks = function (view) {
             // callback handlers specific a view
             var callbacks = {};
-            var cell = view.cell;
+            var cell = view.options.cell;
             if (cell !== null) {
                 // Try to get output handlers
                 var handle_output = null;
