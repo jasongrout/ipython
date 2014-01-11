@@ -101,7 +101,8 @@ function(widget_registry, underscore, backbone){
                     }
                 }
             }
-            //TODO: are there callbacks that make sense in this case?  If so, attach them here as an option 
+            //TODO: are there callbacks that make sense in this case?  If so, attach them here as an option
+            // TODO: previously we had this.save() here---this broke things for Jason.
         },
 
 
@@ -123,59 +124,70 @@ function(widget_registry, underscore, backbone){
             }
         },
 
-
+        callbacks: function(callbacks) {
+            var that = this;
+            if (callbacks.iopub === undefined) {callbacks.iopub = {};}
+            callbacks.iopub.status = function (msg) {
+                that._handle_status(msg, callbacks);
+            }
+            return callbacks;
+        },
+        
         // Custom syncronization logic.
-        _handle_sync: function (method, options) {
-            var model_json = this.toJSON();
-            var attr;
+        sync: function (method, model, options) {
+            var error = options.error || function() {console.error('Backbone sync error:', arguments);}
+            if (this.comm === undefined) {
+                error();
+                return false;
+            }
 
-            // Only send updated state if the state hasn't been changed 
-            // during an update.
-            if (this.comm !== undefined) {    
-                if (this.pending_msgs >= this.msg_throttle) {
-                    // The throttle has been exceeded, buffer the current msg so
-                    // it can be sent once the kernel has finished processing 
-                    // some of the existing messages.
-                    if (method=='patch') {
-                        if (this.msg_buffer === null) {
-                            this.msg_buffer = $.extend({}, model_json); // Copy
-                        }
-                        for (attr in options.attrs) {
-                            var value = options.attrs[attr];
-                            if (this.key_value_lock === null || attr != this.key_value_lock[0] || value != this.key_value_lock[1]) {
-                                this.msg_buffer[attr] = value;
-                            }
-                        }
-                    } else {
-                        this.msg_buffer = $.extend({}, model_json); // Copy
-                    }
-
-                } else {
-                    // We haven't exceeded the throttle, send the message like 
-                    // normal.  If this is a patch operation, just send the 
-                    // changes.
-                    var send_json = model_json;
-                    if (method =='patch') {
-                        send_json = {};
-                        for (attr in options.attrs) {
-                            var value = options.attrs[attr];
-                            if (this.key_value_lock === null || attr != this.key_value_lock[0] || value != this.key_value_lock[1]) {
-                                send_json[attr] = value;
-                            }
-                        }
-                    }
-
-                    var data = {method: 'backbone', sync_data: send_json};
-                    this.comm.send(data, options.callbacks);
-                    this.pending_msgs++;
+            var attrs = (method==='patch') ? options.attrs : model.toJSON(options);
+            
+            if (this.key_value_lock !== null) {
+                var k = this.key_value_lock[0];
+                var v = this.key_value_lock[1];
+                if (attrs[k]===v) {
+                    delete attrs[k];
                 }
+            }
+            if (_.size(attrs) == 0) {
+                error();
+                return false;
+            }
+            var callbacks = model.callbacks(options.callbacks || {});
+            if (this.pending_msgs >= this.msg_throttle) {
+                // The throttle has been exceeded, buffer the current msg so
+                // it can be sent once the kernel has finished processing 
+                // some of the existing messages.
+                
+                // combine updates if it is a 'patch' sync, otherwise replace updates
+                switch (method) {
+                    case 'patch':
+                        this.msg_buffer = _.extend(this.msg_buffer || {}, attrs);
+                        break;
+                    case 'update':
+                        this.msg_buffer = attrs;
+                        break;
+                    default:
+                        error();
+                        return false;
+                }
+                this.msg_buffer_callbacks = callbacks;
+
+            } else {
+                // We haven't exceeded the throttle, send the message like 
+                // normal.  If this is a patch operation, just send the 
+                // changes.
+                var data = {method: 'backbone', sync_data: attrs};
+                this.comm.send(data, callbacks);
+                this.pending_msgs++;
             }
             
             // Since the comm is a one-way communication, assume the message 
-            // arrived.
-            return model_json;
+            // arrived.  Don't call success since we don't have a model back from the server
+            // this means we miss out on the 'sync' event.
         },
-        push: function(callbacks) {
+        save_changes: function(callbacks) {
             this.save(this.changedAttributes(), {patch: true, callbacks: callbacks});
         }
     });
@@ -243,7 +255,7 @@ function(widget_registry, underscore, backbone){
         },
 
         touch: function () {
-            this.model.push(this.callbacks());
+            this.model.save_changes(this.callbacks());
         },
 
     });

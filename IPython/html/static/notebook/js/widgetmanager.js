@@ -24,15 +24,6 @@
     define(["underscore",
              "backbone",
             ], function (underscore, backbone) {
-            
-        // Backbone.sync method must be in widgetmanager.js file instead of 
-        // widget.js so it can be overwritten for different contexts.
-        Backbone.sync = function (method, model, options, error) {
-            var result = model._handle_sync(method, options);
-            if (options.success) {
-                options.success(result);
-            }
-        };
 
         //--------------------------------------------------------------------
         // WidgetManager class
@@ -147,10 +138,6 @@
                     iopub : {
                         output : handle_output,
                         clear_output : handle_clear_output,
-
-                        status : function (msg) {
-                            view.model._handle_status(msg, that.callbacks(view));
-                        },
 
                         // Special function only registered by widget messages.
                         // Allows us to get the cell for a message so we know
