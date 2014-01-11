@@ -22,9 +22,11 @@ define(["notebook/js/widgets/widget"], function(widget_registry){
             this.update(); // Set defaults.
         },
         
-        // Handles: Backend -> Frontend Sync
-        //          Frontent -> Frontend Sync
         update : function(){
+            // Update the contents of this view
+            //
+            // Called when the model is changed.  The model may have been 
+            // changed by another view or by a state update from the back-end.
             this.$el.html(this.model.get('value'));
             return IPython.DOMWidgetView.prototype.update.call(this);
         },
@@ -41,9 +43,11 @@ define(["notebook/js/widgets/widget"], function(widget_registry){
             this.update(); // Set defaults.
         },
         
-        // Handles: Backend -> Frontend Sync
-        //          Frontent -> Frontend Sync
         update : function(){
+            // Update the contents of this view
+            //
+            // Called when the model is changed.  The model may have been 
+            // changed by another view or by a state update from the back-end.
             this.$el.html(this.model.get('value'));
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,this.$el.get(0)]);
 
@@ -88,22 +92,24 @@ define(["notebook/js/widgets/widget"], function(widget_registry){
         },
 
         
-        // Handles: Backend -> Frontend Sync
-        //          Frontent -> Frontend Sync
-        update: function(){
-            if (!this.user_invoked_update) {
+        update: function(options){
+            // Update the contents of this view
+            //
+            // Called when the model is changed.  The model may have been 
+            // changed by another view or by a state update from the back-end.
+            if (options === undefined || options.updated_view != this) {
                 this.$textbox.val(this.model.get('value'));
-            }
 
-            var disabled = this.model.get('disabled');
-            this.$textbox.prop('disabled', disabled);
+                var disabled = this.model.get('disabled');
+                this.$textbox.prop('disabled', disabled);
 
-            var description = this.model.get('description');
-            if (description.length === 0) {
-                this.$label.hide();
-            } else {
-                this.$label.html(description);
-                this.$label.show();
+                var description = this.model.get('description');
+                if (description.length === 0) {
+                    this.$label.hide();
+                } else {
+                    this.$label.html(description);
+                    this.$label.show();
+                }
             }
             return IPython.DOMWidgetView.prototype.update.call(this);
         },
@@ -114,10 +120,11 @@ define(["notebook/js/widgets/widget"], function(widget_registry){
         
         // Handles and validates user input.
         handleChanging: function(e) { 
-            this.user_invoked_update = true;
-            this.model.set('value', e.target.value);
+            
+            // Calling model.set will trigger all of the other views of the 
+            // model to update.
+            this.model.set('value', e.target.value, {updated_view: this});
             this.touch();
-            this.user_invoked_update = false;
         },
     });
 
@@ -142,22 +149,26 @@ define(["notebook/js/widgets/widget"], function(widget_registry){
             this.update(); // Set defaults.
         },
         
-        // Handles: Backend -> Frontend Sync
-        //          Frontent -> Frontend Sync
-        update: function(){
-            if (this.$textbox.val() != this.model.get('value')) {
-                this.$textbox.val(this.model.get('value'));
-            }
+        update: function(options){
+            // Update the contents of this view
+            //
+            // Called when the model is changed.  The model may have been 
+            // changed by another view or by a state update from the back-end.
+            if (options === undefined || options.updated_view != this) {
+                if (this.$textbox.val() != this.model.get('value')) {
+                    this.$textbox.val(this.model.get('value'));
+                }
 
-            var disabled = this.model.get('disabled');
-            this.$textbox.prop('disabled', disabled);
+                var disabled = this.model.get('disabled');
+                this.$textbox.prop('disabled', disabled);
 
-            var description = this.model.get('description');
-            if (description.length === 0) {
-                this.$label.hide();
-            } else {
-                this.$label.html(description);
-                this.$label.show();
+                var description = this.model.get('description');
+                if (description.length === 0) {
+                    this.$label.hide();
+                } else {
+                    this.$label.html(description);
+                    this.$label.show();
+                }
             }
             return IPython.DOMWidgetView.prototype.update.call(this);
         },
@@ -169,7 +180,10 @@ define(["notebook/js/widgets/widget"], function(widget_registry){
         
         // Handles and validates user input.
         handleChanging: function(e) { 
-            this.model.set('value', e.target.value);
+            
+            // Calling model.set will trigger all of the other views of the 
+            // model to update.
+            this.model.set('value', e.target.value, {updated_view: this});
             this.touch();
         },
         

@@ -271,22 +271,21 @@ function(widget_registry, underscore, backbone){
         },
 
         add_class: function (selector, class_list) {
-            var elements = this._get_selector_element(selector);
-            if (elements.length > 0) {
-                elements.addClass(class_list);
-            }
+            this._get_selector_element(selector).addClass(class_list);
         },
         
         remove_class: function (selector, class_list) {
-            var elements = this._get_selector_element(selector);
-            if (elements.length > 0) {
-                elements.removeClass(class_list);
-            }
+            this._get_selector_element(selector).removeClass(class_list);
         },
     
         update: function () {
-            // the very first update seems to happen before the element is finished rendering
-            // so we use setTimeout to give the element time to render
+            // Update the contents of this view
+            //
+            // Called when the model is changed.  The model may have been 
+            // changed by another view or by a state update from the back-end.
+            //      The very first update seems to happen before the element is 
+            // finished rendering so we use setTimeout to give the element time 
+            // to render
             var e = this.$el;
             var visible = this.model.get('visible');
             setTimeout(function() {e.toggle(visible)},0);

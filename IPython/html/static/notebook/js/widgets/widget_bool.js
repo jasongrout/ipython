@@ -30,10 +30,11 @@ define(["notebook/js/widgets/widget"], function(widget_registry){
             this.$checkbox = $('<input />')
                 .attr('type', 'checkbox')
                 .click(function(el) {
-                    that.user_invoked_update = true;
-                    that.model.set('value', that.$checkbox.prop('checked'));
+            
+                    // Calling model.set will trigger all of the other views of the 
+                    // model to update.
+                    that.model.set('value', that.$checkbox.prop('checked'), {updated_view: this});
                     that.touch();
-                    that.user_invoked_update = false;
                 })
                 .appendTo(this.$el);
 
@@ -41,10 +42,12 @@ define(["notebook/js/widgets/widget"], function(widget_registry){
             this.update(); // Set defaults.
         },
         
-        // Handles: Backend -> Frontend Sync
-        //          Frontent -> Frontend Sync
-        update : function(){
-            if (!this.user_invoked_update) {
+        update : function(options){
+            // Update the contents of this view
+            //
+            // Called when the model is changed.  The model may have been 
+            // changed by another view or by a state update from the back-end.
+            if (options === undefined || options.updated_view != this) {
                 this.$checkbox.prop('checked', this.model.get('value'));
 
                 var disabled = this.model.get('disabled');
@@ -69,36 +72,34 @@ define(["notebook/js/widgets/widget"], function(widget_registry){
       
         // Called when view is rendered.
         render : function(){
-            this.$el
-                .html('');
-            this.$button = $('<button />')
+            this.setElement($('<button />')
                 .addClass('btn')
                 .attr('type', 'button')
-                .attr('data-toggle', 'button')
-                .appendTo(this.$el);
-            this.$el_to_style = this.$button; // Set default element to style
+                .attr('data-toggle', 'button'));
 
             this.update(); // Set defaults.
         },
         
-        // Handles: Backend -> Frontend Sync
-        //          Frontent -> Frontend Sync
-        update : function(){
-            if (!this.user_invoked_update) {
+        update : function(options){
+            // Update the contents of this view
+            //
+            // Called when the model is changed.  The model may have been 
+            // changed by another view or by a state update from the back-end.
+            if (options === undefined || options.updated_view != this) {
                 if (this.model.get('value')) {
-                    this.$button.addClass('active');
+                    this.$el.addClass('active');
                 } else {
-                    this.$button.removeClass('active');
+                    this.$el.removeClass('active');
                 }
 
                 var disabled = this.model.get('disabled');
-                this.$button.prop('disabled', disabled);
+                this.$el.prop('disabled', disabled);
 
                 var description = this.model.get('description');
                 if (description.length === 0) {
-                    this.$button.html(' '); // Preserve button height
+                    this.$el.html(' '); // Preserve button height
                 } else {
-                    this.$button.html(description);
+                    this.$el.html(description);
                 }
             }
             return IPython.DOMWidgetView.prototype.update.call(this);
@@ -108,10 +109,11 @@ define(["notebook/js/widgets/widget"], function(widget_registry){
         
         // Handles and validates user input.
         handleClick: function(e) { 
-            this.user_invoked_update = true;
-            this.model.set('value', ! $(e.target).hasClass('active'));
+
+            // Calling model.set will trigger all of the other views of the 
+            // model to update.
+            this.model.set('value', ! $(e.target).hasClass('active'), {updated_view: this});
             this.touch();
-            this.user_invoked_update = false;
         },
     });
 
