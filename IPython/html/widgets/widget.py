@@ -38,9 +38,9 @@ def PropertyLock(instance, key, value):
     del instance._property_lock
 
 def should_send_property(instance, key, value):
-    return not hasattr(instance, _property_lock) or \
-    key != instance._property_lock[0] or \
-    value != instance._property_lock[1]
+    return not (hasattr(instance, '_property_lock') and
+    key == instance._property_lock[0] and
+    value == instance._property_lock[1])
 
 
 class Widget(LoggingConfigurable):
