@@ -82,7 +82,7 @@ function(widget_registry, underscore, backbone){
                     this.trigger('msg:custom', msg.content.data.custom_content);
                     break;
                 case 'display':
-                    this.widget_manager.display_view(msg.parent_header.msg_id, this);
+                    this.widget_manager.display_view(msg, this);
                     break;
             }
         },
