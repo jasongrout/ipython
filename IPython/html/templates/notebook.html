@@ -18,6 +18,7 @@ window.mathjax_url = "{{mathjax_url}}";
 
 <link rel="stylesheet" href="{{ static_url("notebook/css/override.css") }}" type="text/css" />
 <link rel="stylesheet" href=""  id='kernel-css'                             type="text/css" />
+<link rel="stylesheet" href="{{ static_url("components/phosphor/dist/phosphor.css") }}" type="text/css" />
 
 {% endblock %}
 
@@ -324,5 +325,6 @@ data-notebook-path="{{notebook_path}}"
 <script src="{{ static_url("components/text-encoding/lib/encoding.js") }}" charset="utf-8"></script>
 
 <script src="{{ static_url("notebook/js/main.js") }}" charset="utf-8"></script>
+<script src="{{ static_url("components/phosphor/dist/phosphor.js") }}" charset="utf-8"></script>
 
 {% endblock %}
